@@ -2,59 +2,48 @@
 import Header from './components/Header.vue'
 import PostItem from './components/PostItem.vue'
 import { ref } from 'vue'
-import type { Post, RedditPost } from './types';
+import type { Post, RedditApiData } from './types';
+import { mapDataToPosts } from './types';
 import Loader from './components/Loader.vue';
+
 const posts = ref<Post[]>([]);
-const filter = ref('');
+const filter = ref('top');
 const afterId = ref('');
 
-const fetchReddit = (filter = 'top', afterId = '') => {
-  const url = `https://www.reddit.com/r/Awww/${filter}.json${
-    afterId ? '?after=' + afterId : ''
+const fetchReddit = () => {
+  const url = `https://www.reddit.com/r/Awww/${filter.value}.json${
+    afterId.value ? '?after=' + afterId.value : ''
   }`;
 
   return fetch(url)
     .then((res) => res.json())
+    .then(res => handleDataUpdate(res.data as RedditApiData))
     .catch(console.error);
 };
 
-function setPosts(data: Post[]) {
-  posts.value = data;
+function setPosts(data: Post[], append: boolean = false) {
+  append ? posts.value.push(...data) : posts.value = data
+}
+function setFilter(_: string) {
+  filter.value = _
+  afterId.value = ''
+  setPosts([])
+  // fetchReddit()
 }
 
-const handleDataUpdate = (data: any) => {
-    setPosts(
-      data.children.map((postItem: {data: RedditPost}) => {
-        const {
-          title,
-          thumbnail,
-          is_video,
-          permalink,
-          ups,
-          downs,
-          num_comments,
-        } = postItem.data;
-        return {
-          title,
-          thumbnail,
-          permalink: `https://www.reddit.com${permalink}`,
-          is_video,
-          ups,
-          downs,
-          num_comments,
-          videoUrl: is_video && postItem.data.media?.reddit_video?.fallback_url,
-        };
-      })
-    );
+const handleDataUpdate = (data: RedditApiData) => {
+    setPosts(mapDataToPosts(data), posts.value.length > 0);
+      
     afterId.value = data.after;
   };
 
-fetchReddit(filter.value, afterId.value)
-.then(res => handleDataUpdate(res.data))
+// fetchReddit();
 </script>
 
 <template>
-  <Header />
+  <Header 
+    :filter="filter" @setFilter="setFilter" 
+  />
 
   <main>
     <PostItem 
@@ -63,7 +52,7 @@ fetchReddit(filter.value, afterId.value)
       :postItem="post"
     />
   </main>
-  <Loader />
+  <Loader @fetch="fetchReddit"/>
 </template>
 
 <style scoped>
@@ -86,7 +75,7 @@ main {
 
 @media screen and (min-width: 1280px) {
   main {
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   }
 }
 </style>

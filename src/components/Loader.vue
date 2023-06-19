@@ -1,10 +1,42 @@
+<script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+
+defineProps<{onFetch: () => void }>()
+const emit = defineEmits(['fetch'])
+const componentRef = ref<HTMLElement | null>(null);
+
+const options = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            // observer.disconnect();
+            emit('fetch')
+        }
+    });
+}, options);
+
+onMounted(() => {
+    componentRef.value && observer.observe(componentRef.value);
+})
+onBeforeUnmount(() => {
+    componentRef.value && observer.unobserve(componentRef.value);
+});
+</script>
+
+
 <template>
-    <div class="loader">
+    <div class="loader" ref="componentRef">
         <div class="ball first"></div>
         <div class="ball second"></div>
         <div class="ball third"></div>
     </div>
 </template>
+
 
 <style scoped>
 .loader {
