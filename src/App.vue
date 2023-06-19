@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Header from './components/Header.vue'
+import AppHeader from './components/app-header.vue'
 import PostItem from './components/PostItem.vue'
 import { ref } from 'vue'
 import type { Post, RedditApiData } from './types';
 import { mapDataToPosts } from './types';
-import Loader from './components/Loader.vue';
+import DataLoader from './components/data-loader.vue';
 
 const posts = ref<Post[]>([]);
 const filter = ref('top');
@@ -41,7 +41,7 @@ const handleDataUpdate = (data: RedditApiData) => {
 </script>
 
 <template>
-  <Header 
+  <app-header 
     :filter="filter" @setFilter="setFilter" 
   />
 
@@ -52,7 +52,7 @@ const handleDataUpdate = (data: RedditApiData) => {
       :postItem="post"
     />
   </main>
-  <Loader @fetch="fetchReddit"/>
+  <data-loader @fetch="fetchReddit"/>
 </template>
 
 <style scoped>
