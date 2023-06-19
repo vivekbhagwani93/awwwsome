@@ -10,6 +10,8 @@ defineProps<{filter: string, onSetFilter: (_: string) => void;}>()
       <img alt="TS logo" class="logo" src="../assets/Typescript-logo.svg" width="32" height="32" />
       <img alt="ESLint logo" class="logo" src="../assets/ESLint-logo.svg" width="32" height="32" />
     </div>
+
+    <h3 class="app-title"><span>r/awww</span>some!</h3>
     
     <select 
       name="filter" id="filter" :value="filter" 
@@ -22,8 +24,6 @@ defineProps<{filter: string, onSetFilter: (_: string) => void;}>()
         <option value="rising">Rising</option>
       </optgroup>
     </select>
-
-    <h3 class="app-title"><span>r/awww</span>some!</h3>
   </header>
 </template>
 
@@ -67,5 +67,6 @@ header {
     place-items: flex-start;
     flex-wrap: wrap;
   }
+  .app-title { order: 3; }
 }
 </style>
